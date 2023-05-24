@@ -1,0 +1,119 @@
+Les tuyaux dans nest ont duex cas d'utilisation pour les données :
+
+- Transformation  : Transformer des donnéees d'entrée en une forme souhaité(ex: chaine => entier)
+- Validation : Evaluer les données recu si elles sont valide, les transmettre  sans modification
+
+Un Tube est une classe avec le décorateur @Injectable() qui implémente l'interface (PipeTransform)
+
+Nest interpose le tube juste avant l'invocation d'un méthode et le tube recoit les args destinées à la méthode et opèrent sur eux
+Toute opération de validation ou de transformation à lieux à ce moment et après le gestionnaire de route est appelé
+
+Nest possède des tuyaux intégré et il est possible de créer ses propres tuyaux
+
+NB Aucune méthode du gestionnaire de route n'est exécuté si une exception est levé dans un pipe
+
+9 tuyaux de Nest (depuis le "@nestjs/common")
+
+ValidationPipe
+ParseIntPipe
+ParseFloatPipe
+ParseBoolPipe
+ParseArrayPipe
+ParseUUIDPipe
+ParseEnumPipe
+DefaultValuePipe
+ParseFilePipe
+
+Utilisation de ParseInPipe (Transformation) -- garantit qu'un param de gestionnaire de route est convertit en entier et lève un exception si la conversion échoue
+
+exemple pour la transformation d'une prop en id
+
+import {ParseIntPipe} from '@nestjs/common'
+
+@Get(":id")
+findOne(@Param("id", ParseIntPipe) id : number){
+  console.log(id)
+  return this.userService.findOne(id)
+}
+
+TUYAUX PERSONNALISE
+-------------------
+
+exemple d'implémentation de la fonction validation.pip 
+
+import {PipeTransform , Injectable, ArgumentMetadata} from '@nestjs/common'
+
+@Injectable()
+export class ValidationPipe implements PipeTransform{
+  tranform(value: any, metadata: ArgumentMetadata){
+    return value 
+  }
+}
+
+NB Chaque tuyau implémente la méthode transform() pour remplir PipeTransform 
+
+Une autre approche tout aussi efficace consite à utiliser les bibliothèques de validation de classe
+
+npm i --save class-validator class-transformer
+
+dans les dto du module user on peut avoir
+
+import {IsString, IsInt} from 'class-validator'
+export class CreateUserDto{
+  @IsString()
+  name : string;
+
+  @IsInt()
+  age : int;
+
+}
+
+Si on veut créer notre propre classe de validation à l'aide de ses méthodes on peut utiliser le schema suivant: 
+
+Un exemple de tube peut être le suivant
+
+import {PipeTransform, Injectable, ArgumentMetadata,BadRequestException} from '@nestjs/common'
+import {validate} from 'class-validator'
+import {plainToInstance} from 'class-transformer'
+
+@Injectable()
+export class ValidationPipe implement PipeTransform<any>{
+  async transform(value: any, {metatype}: ArgumentMetadata){
+    if(!metatype || this.toValidate(metatype)){
+      return value
+    }
+    const object = plainToInstance(metatype, value);
+    const error = await  validate(object)
+    if(error.length>0){
+      throw new BadRequestException("validation failed")
+    }
+    return value;
+  }
+
+  private toValidate(metatype : Function): boolean{
+    const type: Function[] = [String, Number, Boolean,Array, Object]
+    return !type.includes(metatype)
+  }
+}
+
+Utilisation dans une méthode d'un controller
+-------
+@Post()
+async create(
+  @Body(new ValidationPipe()) createCatDto: CreateCatDto,
+) {
+  this.catsService.create(createCatDto);
+}
+
+
+PORTE GLOBALE
+--------------
+
+
+la classe validationPipe est concu pour être le plus générique, importer la dans le main.ts
+ 
+import {ValidationPipe} from "@nestjs/common"
+
+app.useGlobalPipe(new ValidationPipe())
+
+ATTENTION Cette méthode ne configure pas de cannaux pour les passerrelle et microservice 

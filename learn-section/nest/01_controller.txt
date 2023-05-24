@@ -1,0 +1,108 @@
+// NB METTRE LACCENT SUR LA FACON DE GERER LES ERREURS POUR EVITER TOUT BLOCAGE DE SERVEUR
+
+
+Traite les demandes entrante et renvoie des réponses aux utilisateurs
+
+- le routage controle quel controlleur recoit la requête
+
+- Pour créer facilement un controller CRUD avec la validation, utiliser le générateur CRUD
+
+nest g resource [name]
+
+
+- Pour creer un controller a l'aide de la cli : nest g controller cats
+
+les type de requete que l'on peut recevoir dans le controller sont: 
+
+- Req (importer de request) (@Req request : Request)
+- Res (importer de Response) (@Res response : Response)
+- Next middleware(pour passer à une autre étape)
+- @Body(key?:string) req.body/req.body[key]
+- Query(key?:string) req.query/req.query[key] exemple : getDocs(@Query('version') version) === req.query.version
+
+- @Param(key?: string) req.params/req.params[key]
+(lorsqu'on a des parametres dynamique sur l'url) : (:id) exemple : 
+@Get(':id')
+findOne(@Param() params: any): string {
+  console.log(params.id);
+  return `This action returns a #${params.id} cat`;
+}
+
+--- code d'état 
+
+le code d'état de la requete est toujours 200 , et pour post : 201
+
+on peut modifier le comportement en ajoutant : @HttpCode(204)
+
+@Redirect("http://url:3000")
+
+--- routage de sous domaine
+
+@Controller({ host: 'admin.example.com' }) : exige que l'hote http des req entrante à une val spécifique
+
+----
+Asynchronicité des requete
+
+@Get()
+async findAll(): Promise<any[]> {
+  return [];
+}
+
+Le gestionnaire de routage renverra des flux observable (s'abonne à la source et renvoie la dernière valeur émise)
+
+@Get()
+findAll(): Observable<any[]> {
+  return of([]);
+}
+
+
+Avec typescript on a besoin d'utiliser des DTO (Data Transfert Object) qui définit comment les données seront envoyé sur le réseau
+
+Dans une req post on peut utiliser le DTO pour definir quel est le type de la requete
+::RETOURNER UN MESSAGE DERREUR SPECIAL
+try {
+  const patson: CreateUserDto = createUserDto;
+  console.log(patson);
+  return this.userService.create(createUserDto);
+} catch (error) {
+  throw new HttpException(
+    {
+      status: HttpStatus.FORBIDDEN,
+      error: 'special message',
+    },
+    HttpStatus.FORBIDDEN,
+    {
+      cause: error,
+    },
+  );
+}
+
+Exception intégrer dans nest
+----------------------------
+
+BadRequestException
+UnauthorizedException
+NotFoundException
+ForbiddenException
+NotAcceptableException
+RequestTimeoutException
+ConflictException
+GoneException
+HttpVersionNotSupportedException
+PayloadTooLargeException
+UnsupportedMediaTypeException
+UnprocessableEntityException
+InternalServerErrorException
+NotImplementedException
+ImATeapotException
+MethodNotAllowedException
+BadGatewayException
+ServiceUnavailableException
+GatewayTimeoutException
+PreconditionFailedException
+
+OBJET DE REPONSE SPECIFIQUE A LA BIBLIOTHEQUE NEST @res (perte des intercepteur et des décorateur)
+
+CONCLUSION LA STRUCTURE ADOPTER POUR LA CONCEPTION DES CONTROLLER SERA 
+- UNE GESTION DERREUR VIA DES TRY ET CATCH
+- LUTILISATION FONCTION ASYNCHRONE POUR EXECUTER DES REQUETES ASYNCHRONE ET RETOURNER UNE PROMESSE SI POSSIBLE

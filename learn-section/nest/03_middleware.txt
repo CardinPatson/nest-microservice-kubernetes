@@ -1,0 +1,85 @@
+MIDDLEWARE
+
+Fonction qui sont appelé avant le gestionnaire de root (ils ont accès au objet de req et de res et à la fonction middleware next())
+
+ClientSide ====> Middleware ====> @RequestMapping
+
+Les fonctions de middleware :
+
+- Excécute n'importe quel code (stockage de fichier, authentification utilisateu)
+- Apporte des modifications aux objets de requete et de réponses
+- Mettre fin au cycle requete réponse
+- appeler d'autre fonction middleware 
+
+La classe du middleware doit ausssi avoir le décorateur @Injectable et implémenter l'interface NestMiddleware
+
+logger.middleware.ts
+
+import {Injectable, NestMiddleware} from '@nestjs/common'
+import {Request, Response,NextFunction} from 'express'
+
+@Injectable()
+export class LoggerMiddleware implements NestMiddleware{
+  use(req: Request, res: Response, next: NextFunction){
+    console.log('Request...')
+    next()
+  }
+}
+
+Le middleware nest peut injecter des dépendances dans le même module via le constructeur
+
+Les modules qui incluent le middleware doivent implémenter l'interface NestMiddleware et on configure le middleware a l'aide de la méthode configure()
+
+NB configure peut aussi être asynchrone
+ex : AppModule 
+
+import {Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
+import {LoggerMiddleware} from './logger.middleware'
+import {UserModule} from './user.module'
+import {UserController} from './user.controller'
+
+@Module({
+  imports : [UserModule],
+})
+//configuration du middleware pour la route user
+
+export class AppModule implement NestModule {
+  configure(consumer: MiddlewareConsumer){
+    consumer.apply(LoggerMiddleware).forRoutes('user')  // restreint pour toutes les méthodes de la route user
+    consumer.apply(LoggerMiddleware).forRoutes(path : 'user', method: RequestMethod.GET) // restreint pour la méthode GET de la route user
+    consuemr.apply(LoggerMiddleware).forRoutes(UserController) // restreint pour le controller
+  }
+}
+
+NB : La méthode forRoutes peut prendre plusieurs classes de controller
+
+- On peut aussi exclure certaine route du middleware
+
+consummer.apply(LoggerMiddleware).exclude({path: "users", method: RequestMethod.GET}, 'users/(.*)').forRoutes(UserController)
+
+
+si le middleware n'a pas de membre ou de méthode il peut être transformé en une function
+
+import {Request , Response, NextFunction} from 'express'
+
+export function logger(req : Request, res : Response, next : NextFunction){
+  console.log('Request...')
+  next()
+}
+
+consumer.apply(logger).forRoutes(UserController)
+
+NB  Utiliser le middlware fonctionnel chaque fois qu'il n'a pas besoin de dépendances
+
+MIDDLEWARE MULTIPLE
+--------------------
+
+consumer.apply(cors(), helmet(), logger).forRoutes(UsersController)
+
+MIDDLEWARE MONDIAL
+------------------
+Dans le cas ou on veut utiliser un middleware dans toute l'application:
+
+const app = await NestFactory.create(AppModule)
+
+app.use(logger)

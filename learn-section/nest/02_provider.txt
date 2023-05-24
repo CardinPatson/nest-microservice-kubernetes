@@ -1,0 +1,108 @@
+De nombreuse classe peuvent être traité comme des fournisseur
+
+- l'idée d'un fournisseur est de l'injecter en tant que dépendance => Les objets peuvent créer des relations les uns les autres
+
+Les controlleurs gèrent les requêtes Http et délègues les tâches plus complexes au fournisseur
+
+on peut avoir:
+
+1. Les services*
+
+Responsable du stockage et de la récupération des données
+
+nest g service user (génère un service)
+
+- décorateur @Injectable() : attache des métadonnées
+
+iNJECTION DE DEPENDANCE
+--------------------------------------------------
+MODULE
+
+considérons que l'on a 03 modules : user, cat, dog et que l'on veut partager un module entre les 03
+
+: shared (module shared module)
+
+-   Les modules sont des singleton et on peut partager une instance entre plusieurs module
+
+si on veut partager une instance de sharedService entre les 03 modules existant
+
+1. Exporter le service sharedService dans son module
+@Module({
+  providers : [sharedService],
+  exports : [sharedService]
+})
+
+2. Tous les modules qui importe le module (sharedModule) aura accès au sharedService
+
+3. D'autre module peuvent réexporter le module qu'il importe ex: si on import sharedModule dans catsModule et userModule utilise catsModule, alors userModule pourra utiliser sharedModule
+@Module({
+  imports: [catsModule, sharedModule]
+  providers: [userService, cateService]
+  exports : [sharedModule, catModule]
+})
+
+NB Les classes de module peuvent injecter des fournisseur pour un configuration
+export class sharedModule{
+  constructor(private sharedService: SharedService){}
+}
+
+ATTENTION:: Les classes de module elle meme ne sont pas injecter en tant que déps => dépendance circulaire
+
+
+MODULE GLOBALE
+
+Si on veut importer la même classe de module partout ex : Une connexion à la base de données,
+on peut utiliser le décorateur Global
+
+@Global()
+@Module({
+  controllers : [sharedController],
+  providers : [sharedService],
+  exports : [sharedService]
+})
+
+- Les modules globaux ne doivent être enregistrer qu'une fois dans le module générale
+
+MODULE DYNAMIQUE
+
+ex : DatabaseModule
+
+import {Module, DynamicModule} from '@nestjs/common'
+import {createDatabaseProviders} from './database.providers';
+import {Connection} from './connection.provider'
+
+@Module({
+  providers : [Connection],
+})
+
+export class DatabaseModule{
+  static forRoot(entities = [] , options?): DynamicModule{
+    const providers = createDatabaseProviders(options, entities)
+    return {
+      module: DatabaseModule,
+      providers : providers,
+      exports : providers
+    }
+  }
+}
+
+- forRoot() peut renvoyer un module dynamique
+
+Pour importer le module de base de données on peut: 
+
+import {Module} from '@nestjs/common';
+import {DatabaseModule} from './database.module'
+import {User} from 'user.entity'
+
+@Module({
+  imports : [DatabaseModule.forRoot([User])]
+})
+
+export class AppModule{}
+-----------------------------------------------------------------------
+AUTHENTIFICATION DES UTILISATEURS
+
+Les données des utilisateurs seront stocké sur un serveur AWS (Pour eviter une compromission des données utilisateurs)
+
+-
+

@@ -1,0 +1,7 @@
+connection string pattern
+
+postgresql://<username>:<password>@<hostname>:<port>/<database>
+
+change the password of user postgres
+
+ \password postgres
