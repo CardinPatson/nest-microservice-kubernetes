@@ -1,14 +1,17 @@
 import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty, IsNumber } from "class-validator";
+import { IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreatePGReservationDto {
   @IsDate()
   @Type(()=>Date)
-  startdate: Date;
+  startDate: Date;
 
   @IsDate()
   @Type(()=>Date)
-  enddate: Date; 
+  endDate: Date; 
+
+  @IsString()
+  testMigration: String;
 
   // @IsNumber()
   // @IsNotEmpty()

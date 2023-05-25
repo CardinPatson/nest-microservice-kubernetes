@@ -9,7 +9,7 @@ export class PGReservationService {
     private readonly reservationRepository: PGReservationRepository
   ){}
   create(createPGReservationDto: CreatePGReservationDto) {
-    console.log(createPGReservationDto)
+    console.log("before send request...", createPGReservationDto)
     return this.reservationRepository.create({
       ...createPGReservationDto,
       timestamp: new Date(),

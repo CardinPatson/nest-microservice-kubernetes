@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CommonService } from './common.service';
 import { DatabaseModule } from './database/database.module';
+// import { PGDatabaseModule } from './database/pg-database/pg-database.module';
 import { LoggerModule } from './logger/logger.module';
 
 @Module({
@@ -8,4 +9,5 @@ import { LoggerModule } from './logger/logger.module';
   exports: [CommonService],
   imports: [DatabaseModule, LoggerModule],
 })
+
 export class CommonModule {}

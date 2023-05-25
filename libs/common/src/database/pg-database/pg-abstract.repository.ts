@@ -1,6 +1,7 @@
 import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere,UpdateResult, Repository } from "typeorm";
 import { PGAbstractInterface, PGAbstractData } from "./pg-abstract.interface";
-import { Logger } from "nestjs-pino";
+// import { Logger } from "nestjs-pino";
+import { Logger } from "typeorm";
 
 //THIS CLASS IS AN ABSTRACTION THAT ALL MICROSERVICE WILL USE IN OTHER TO HAVE SCALABLE APP
 export  abstract class PGAbstractRepository<T extends PGAbstractData> implements PGAbstractInterface<T>{
@@ -21,6 +22,7 @@ export  abstract class PGAbstractRepository<T extends PGAbstractData> implements
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
+    console.log(data, "before creation")
     return this.entity.create(data)
   }
 

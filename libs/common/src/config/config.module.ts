@@ -1,19 +1,35 @@
 import { Module } from '@nestjs/common';
-import { ConfigService, ConfigModule as NestConfigModule } from '@nestjs/config';
+import { ConfigFactory, ConfigService, ConfigModule as NestConfigModule } from '@nestjs/config';
 import * as Joi from "joi"
+// import {pgDatabase, mgDatabase} from '../pg-database/db/database';
+import {pgDatabase, mgDatabase} from '../database/db/database';
 
+//ENV VAR: GOING INTO JOI
+// NODE_ENV: Joi.string()
+// .valid('development', 'production', 'test', 'provision')
+// .default('development'),
+// POSTGRES_USER: Joi.string().required(),
+// POSTGRES_PASSWORD: Joi.string().required(),
+// POSTGRES_PORT: Joi.number().required().default(5432),
+// POSTGRES_HOST: Joi.string().required(),
+// POSTGRES_DB: Joi.string().required()
 @Module({
   imports: [NestConfigModule.forRoot({
-    validationSchema: Joi.object({
-      MONGODB_URI: Joi.string().required(),
-      POSTGRES_USER: Joi.string().required(),
-      POSTGRES_PASSWORD: Joi.string().required(),
-      POSTGRES_PORT: Joi.number().required(),
-      POSTGRES_HOST: Joi.string().required(),
-      POSTGRES_DB: Joi.string().required()
-    })
+    load: [pgDatabase, mgDatabase],
+    // validationSchema: Joi.object({
+    //   MONGODB_URI: Joi.string().required(),
+    //   POSTGRES_USER: Joi.string().required(),
+    //   POSTGRES_PASSWORD: Joi.string().required(),
+    //   POSTGRES_PORT: Joi.number().required().default(5432),
+    //   POSTGRES_HOST: Joi.string().required(),
+    //   POSTGRES_DB: Joi.string().required()
+    // }),
   })],
   providers: [ConfigService],
   exports : [ConfigService]
 })
-export class ConfigModule {}
+export class ConfigModule {
+  // static forFeature(databaseConfig: ConfigFactory){
+  //   return NestConfigModule.forFeature(databaseConfig)
+  // }
+}

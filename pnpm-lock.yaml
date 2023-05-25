@@ -28,6 +28,9 @@ dependencies:
   class-validator:
     specifier: ^0.14.0
     version: 0.14.0
+  dotenv:
+    specifier: ^16.0.3
+    version: 16.0.3
   joi:
     specifier: ^17.9.2
     version: 17.9.2
