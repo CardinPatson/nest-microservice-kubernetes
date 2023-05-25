@@ -1,0 +1,4 @@
+"db:migration-gen": "pnpm run orm -- migration:generate -d ./libs/common/src/database/db/data-source.ts",
+"db:migration-revert": "pnpm run orm -- migration:revert -d ./libs/common/src/database/db/data-source.ts",
+"db:migration-run": "pnpm run orm -- migration:run -d ./libs/common/src/database/db/data-source.ts",
+"orm": "ts-node node_modules/typeorm/cli.js",

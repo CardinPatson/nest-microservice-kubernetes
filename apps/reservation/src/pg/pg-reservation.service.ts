@@ -9,12 +9,12 @@ export class PGReservationService {
     private readonly reservationRepository: PGReservationRepository
   ){}
   create(createPGReservationDto: CreatePGReservationDto) {
-    console.log("before send request...", createPGReservationDto)
-    return this.reservationRepository.create({
+    // Create create a new entity of object === new Entity(data)
+    const reservation = this.reservationRepository.create({
       ...createPGReservationDto,
       timestamp: new Date(),
-      // userId: 1
     })
+    return this.reservationRepository.save(reservation)
   }
 
   findAll() {

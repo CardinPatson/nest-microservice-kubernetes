@@ -16,7 +16,7 @@ export const dataSourceOptions: DataSourceOptions = {
   database: configService.get('POSTGRES_DB'),
   // entities: [path.resolve(`${__dirname}/../../../**/**.entity{.ts,.js}`)],
   entities: [`dist/**/**.entity{.ts,.js}`],
-  migrations: [path.resolve(`${__dirname}/migrations/*{.ts,.js}`)],
+  migrations: [path.resolve(`${__dirname}/../pg-database/migrations/*{.ts,.js}`)],
   synchronize: false, // ! SET TO FALSE IN PRODUCTION
   logging: true
 

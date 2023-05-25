@@ -253,3 +253,84 @@ créerr un service mongo puis changer l'url dans l'env par localhost a mongo:270
 - permet que si on veut changer l'orm we can update the abstract clas
 
 - important to structure the API poperly from the begining 
+
+
+## Migration
+
+Pour ce qui est de la migration : 
+
+Après avoir configurer le datasource comme suit
+
+```ts
+import { DataSource, DataSourceOptions } from "typeorm"
+import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
+import { config } from 'dotenv';
+
+const configService = new ConfigService();
+
+config()
+
+export const dataSourceOptions: DataSourceOptions = {
+  type: 'postgres',
+  host: configService.get('POSTGRES_HOST'), // the name of your service
+  port: parseInt(configService.get('POSTGRES_PORT'), 10) || 5432,
+  username: configService.get('POSTGRES_USER'),
+  password: configService.get('POSTGRES_PASSWORD'),
+  database: configService.get('POSTGRES_DB'),
+  // entities: [path.resolve(`${__dirname}/../../../**/**.entity{.ts,.js}`)],
+  entities: [`dist/**/**.entity{.ts,.js}`],
+  migrations: [path.resolve(`${__dirname}/../pg-database/migrations/*{.ts,.js}`)],
+  synchronize: false, // ! SET TO FALSE IN PRODUCTION
+  logging: true
+
+};
+
+const dataSource = new DataSource(dataSourceOptions)
+export default dataSource
+```
+
+vous remarquere que l'entities propertie pointe sur le dist/**/...
+
+Cela implique que lors du build de l'application, vous devez désactiver webpack pour avoir tous les fichiers map dans le dist
+
+Dans le package.json on a les lignes suivantes
+
+```
+    "typeorm": "npx typeorm-ts-node-commonjs -d ./libs/common/src/database/db/data-source.ts",
+    "migration:generate": "pnpm run typeorm migration:generate",
+    "migration:show": "pnpm run typeorm migration:show",
+    "migration:run": "pnpm run typeorm migration:run",
+    "migration:revert": "pnpm run typeorm migration:revert",
+```
+
+Pour exécuter le build avant la migration vous pouvez avoir
+
+```
+    "typeorm:prod": "pnpm run build && npx typeorm -d ./libs/common/src/database/db/data-source.ts",
+    "migration:generate:prod": "pnpm run typeorm:prod migration:generate",
+    "migration:run:prod": "pnpm run typeorm:prod migration:run",
+    "migration:revert:prod": "pnpm run typeorm:prod migration:revert"
+```
+
+Pour générer donc votre migration vous éxécutez soit:
+
+```
+pnpm run build
+pnpm run migration:generate libs/common/src/database/pg-database/migrations/Reservation
+```
+
+soit
+
+```
+pnpm run migration:generate libs/common/src/database/pg-database/migrations/Reservation
+```
+
+libs/common/src/database/pg-database/migrations/Reservation est le dossier de destination de votre fichier de migration
+
+
+### Soucis à regler avec la migration
+
+- Lorsqu'on fait le build de l'application avec webpack désactivé, on a les fichier compilé qui sont splité et on peut effectuer la migration en pointant les entités vers le dist. 
+
+- Les soucis est au lancement de l'application qui n'arrive pas à résoudre les imports avec l'application qui est builder sans webpack

@@ -21,12 +21,11 @@ export  abstract class PGAbstractRepository<T extends PGAbstractData> implements
     return await this.entity.save(data)
   }
 
-  async create(data: DeepPartial<T>): Promise<T> {
-    console.log(data, "before creation")
+  create(data: DeepPartial<T>): T {
     return this.entity.create(data)
   }
 
-  async createMany(data: DeepPartial<T>[]): Promise<T[]> {
+  createMany(data: DeepPartial<T>[]): T[] {
     return this.entity.create(data)
   }
 

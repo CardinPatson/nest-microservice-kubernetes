@@ -19,7 +19,7 @@ export const pgDatabase = registerAs(
       // entities: [path.resolve(`${__dirname}/../../../**/**.entity{.ts,.js}`)],
       // entities: [path.resolve(`${__dirname}/../../../**/**.entity{.ts,.js}`)],
       migrations: [
-        path.resolve(`${__dirname}/../migrations/*{.ts,.js}`)
+        path.resolve(`${__dirname}/../pg-database/migrations/*{.ts,.js}`)
       ],
       autoLoadEntities: true,
       migrationsRun: true,

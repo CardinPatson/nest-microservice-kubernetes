@@ -2,9 +2,9 @@ import { DeepPartial, FindManyOptions, FindOneOptions, PrimaryGeneratedColumn, U
 
 export interface PGAbstractInterface<T>{
 
-  create(data: DeepPartial<T>): Promise<T>;
+  create(data: DeepPartial<T>): T;
 
-  createMany(data: DeepPartial<T>[]): Promise<T[]>;
+  createMany(data: DeepPartial<T>[]): T[];
 
   save(data: DeepPartial<T>): Promise<T>;
 

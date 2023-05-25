@@ -8,7 +8,7 @@ import { PGReservationController } from './pg/pg-reservation.controller';
 import { PGReservationRepository } from './pg/pg-reservation.repository';
 import { ReservationDocument, ReservationSchema } from './models/reservation.schema';
 // import { LoggerModule, PGDatabaseModule } from '@app/common';
-import { LoggerModule } from '@app/common';
+import { LoggerModule } from '@app/common/logger';
 import { Reservation } from './models/reservation.entity';
 
 @Module({

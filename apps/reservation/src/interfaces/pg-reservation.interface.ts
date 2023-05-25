@@ -1,4 +1,4 @@
-import { PGAbstractInterface } from "@app/common";
+import { PGAbstractInterface } from "@app/common/database";
 import { Reservation } from "../models/reservation.entity";
 
 export interface PGReservationRepositoryInterface 

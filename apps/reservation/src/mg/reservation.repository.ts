@@ -1,4 +1,4 @@
-import { AbsctractRepository } from "@app/common";
+import { AbsctractRepository } from "@app/common/database";
 import { Injectable, Logger } from "@nestjs/common";
 import { ReservationDocument } from "../models/reservation.schema";
 import { InjectModel } from "@nestjs/mongoose";

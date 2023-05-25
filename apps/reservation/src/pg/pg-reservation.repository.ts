@@ -1,4 +1,4 @@
-import { PGAbstractData, PGAbstractRepository } from "@app/common";
+import { PGAbstractData, PGAbstractRepository } from "@app/common/database";
 import { Reservation } from "../models/reservation.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
