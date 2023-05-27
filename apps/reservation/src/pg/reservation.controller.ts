@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PGReservationService } from './reservation.service';
+import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 
 @Controller('pg/reservation')
-export class PGReservationController {
-  constructor(private readonly reservationService: PGReservationService) {}
+export class ReservationController {
+  constructor(private readonly reservationService: ReservationService) {}
 
   @Post()
   create(@Body() createReservationDto: CreateReservationDto) {

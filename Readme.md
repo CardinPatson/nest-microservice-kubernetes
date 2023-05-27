@@ -328,6 +328,10 @@ pnpm run migration:generate libs/common/src/database/pg-database/migrations/Rese
 
 libs/common/src/database/pg-database/migrations/Reservation est le dossier de destination de votre fichier de migration
 
+soit pour exécuter une migration pour un microservice spécifique:
+```
+pnpm run typeorm -d apps/auth/src/db/data-source.ts migration:generate apps/auth/src/db/migrations/UserName
+```
 
 
 ### Soucis à regler avec la migration

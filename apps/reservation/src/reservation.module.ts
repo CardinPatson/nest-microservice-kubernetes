@@ -1,32 +1,44 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@app/common/database';
-import { ReservationService } from './mg/reservation.service';
-import { ReservationController } from './mg/reservation.controller';
-import { ReservationRepository } from './mg/reservation.repository';
-import { PGReservationService } from './pg/reservation.service';
-import { PGReservationController } from './pg/reservation.controller';
-import { PGReservationRepository } from './pg/reservation.repository';
+import { ReservationService as MGReservationService } from './mg/reservation.service';
+import { ReservationController as MGReservationController } from './mg/reservation.controller';
+import { ReservationRepository as MGReservationRepository} from './mg/reservation.repository';
+import { ReservationService as PGReservationService } from './pg/reservation.service';
+import { ReservationController as PGReservationController } from './pg/reservation.controller';
+import { ReservationRepository as PGReservationRepository } from './pg/reservation.repository';
 import { ReservationDocument, ReservationSchema } from './mg/models/reservation.schema';
-// import { LoggerModule, PGDatabaseModule } from '@app/common';
 import { LoggerModule } from '@app/common/logger';
 import { Reservation } from './pg/models/reservation.entity';
+import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
 
+import { pgDatabase, mgDatabase } from './db/database';
 @Module({
   imports: [
-    // PGDatabaseModule.forFeature([Reservation]),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [pgDatabase, mgDatabase],
+      validationSchema: Joi.object({
+        MONGODB_URI: Joi.string().required(),
+        POSTGRES_USER: Joi.string().required(),
+        POSTGRES_PASSWORD: Joi.string().required(),
+        POSTGRES_PORT: Joi.number().required().default(5432),
+        POSTGRES_HOST: Joi.string().required(),
+        POSTGRES_DB: Joi.string().required(),
+      })
+    }),
     DatabaseModule, 
-    // PGDatabaseModule,
     DatabaseModule.mgForFeature([{name : ReservationDocument.name, schema: ReservationSchema}]),
     DatabaseModule.pgForFeature([Reservation]),
     LoggerModule,
   ],
   controllers: [
-    ReservationController, 
+    MGReservationController, 
     PGReservationController
   ],
   providers: [
-    ReservationService, 
-    ReservationRepository, 
+    MGReservationService, 
+    MGReservationRepository, 
     PGReservationService, 
     PGReservationRepository
   ]

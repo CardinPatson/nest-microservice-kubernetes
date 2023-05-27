@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
-import { PGReservationRepository } from './reservation.repository';
+import { ReservationRepository } from './reservation.repository';
 
 @Injectable()
-export class PGReservationService {
+export class ReservationService {
   constructor(
-    private readonly reservationRepository: PGReservationRepository
+    private readonly reservationRepository: ReservationRepository
   ){}
   create(createPGReservationDto: CreateReservationDto) {
     // Create create a new entity of object === new Entity(data)

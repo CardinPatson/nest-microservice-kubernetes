@@ -8,7 +8,7 @@ import { Repository } from "typeorm";
 // import { Logger } from "typeorm";
 
 @Injectable()
-export class PGReservationRepository 
+export class ReservationRepository 
   extends PGAbstractRepository<Reservation>
   implements ReservationRepositoryInterface
   {

@@ -10,20 +10,37 @@ import { UsersModule as PGUsersModule } from './pg/users/users.module';
 
 import { LoggerModule } from '@app/common/logger';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as Joi from 'joi';
 
+import { pgDatabase, mgDatabase } from './db/database';
 @Module({
   imports: [
     MGUsersModule,
     PGUsersModule,
     LoggerModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [pgDatabase, mgDatabase],
+      validationSchema: Joi.object({
+        MONGODB_URI: Joi.string().required(),
+        POSTGRES_USER: Joi.string().required(),
+        POSTGRES_PASSWORD: Joi.string().required(),
+        POSTGRES_PORT: Joi.number().required().default(5432),
+        POSTGRES_HOST: Joi.string().required(),
+        POSTGRES_DB: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION: Joi.string().required()
+      })
+    }),
     JwtModule.registerAsync({
       useFactory: ((configService: ConfigService) =>({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
           expiresIn: `${configService.get("JWT_EXPIRATION")}`
         }
-      }))
+      })),
+      inject:[ConfigService]
     })
   ],
   controllers: [MGAuthController, PGAuthController],
