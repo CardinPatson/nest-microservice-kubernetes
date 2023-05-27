@@ -1,15 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PGReservationService } from './pg-reservation.service';
-import { CreatePGReservationDto } from '../dto/create-pg-reservation.dto';
-import { UpdatePGReservationDto } from '../dto/update-pg-reservation.dto';
+import { PGReservationService } from './reservation.service';
+import { CreateReservationDto } from './dto/create-reservation.dto';
+import { UpdateReservationDto } from './dto/update-reservation.dto';
 
 @Controller('pg/reservation')
 export class PGReservationController {
   constructor(private readonly reservationService: PGReservationService) {}
 
   @Post()
-  create(@Body() createPGReservationDto: CreatePGReservationDto) {
-    return this.reservationService.create(createPGReservationDto);
+  create(@Body() createReservationDto: CreateReservationDto) {
+    return this.reservationService.create(createReservationDto);
   }
 
   @Get()
@@ -23,7 +23,7 @@ export class PGReservationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReservationDto: UpdatePGReservationDto) {
+  update(@Param('id') id: string, @Body() updateReservationDto: UpdateReservationDto) {
     return this.reservationService.update(updateReservationDto, +id);
   }
 

@@ -3,8 +3,9 @@ import {config} from "dotenv"
 import { registerAs } from '@nestjs/config';
 import { ConfigService as NestConfigModule } from '@nestjs/config';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { Reservation } from 'apps/reservation/src/models/reservation.entity';
-
+// import { Reservation } from 'apps/reservation/src/models/reservation.entity';
+import { Reservation } from 'apps/reservation/src/pg/models/reservation.entity';
+import { Users } from 'apps/auth/src/pg/users/models/users.entity';
 config()
 
 const configService = new NestConfigModule();
@@ -15,8 +16,7 @@ export const pgDatabase = registerAs(
   (): PostgresConnectionOptions =>
     ({
       logging: false,
-      entities: [Reservation],
-      // entities: [path.resolve(`${__dirname}/../../../**/**.entity{.ts,.js}`)],
+      entities: [Reservation, Users],
       // entities: [path.resolve(`${__dirname}/../../../**/**.entity{.ts,.js}`)],
       migrations: [
         path.resolve(`${__dirname}/../pg-database/migrations/*{.ts,.js}`)

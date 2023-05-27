@@ -329,8 +329,33 @@ pnpm run migration:generate libs/common/src/database/pg-database/migrations/Rese
 libs/common/src/database/pg-database/migrations/Reservation est le dossier de destination de votre fichier de migration
 
 
+
 ### Soucis à regler avec la migration
 
 - Lorsqu'on fait le build de l'application avec webpack désactivé, on a les fichier compilé qui sont splité et on peut effectuer la migration en pointant les entités vers le dist. 
 
 - Les soucis est au lancement de l'application qui n'arrive pas à résoudre les imports avec l'application qui est builder sans webpack
+
+- Resolution: Dans le tsconfig de l'app mettez "outDir": "../../dist/" pour qu'il compile l'application a la racine du dist
+
+
+Nouvelle compréhension de la migration: 
+
+- Faire attention de pas avoir la création de table identique dans le fichier de migration
+- Désactiver webpack, ce qui fera le build des différents entités, Run la migration puis lancer le serveur
+- 
+
+## Authentification
+
+nest g app auth (microservice qui servira à authentifier l'utilisateur)
+
+nest g module users (dans le service qui servira d'authentification on va avoir un module d'utilisateur)
+
+nest g controller users
+
+nest g service users
+
+Add the new service to the authentification
+
+
+

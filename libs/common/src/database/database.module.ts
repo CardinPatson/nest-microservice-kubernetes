@@ -5,18 +5,18 @@ import {TypeOrmModule} from "@nestjs/typeorm"
 import { DataSource } from 'typeorm';
 import { ConfigModule } from '../config/config.module';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
-import { Reservation } from 'apps/reservation/src/models/reservation.entity';
-import { pgDatabase, mgDatabase } from './db/database';
-
+// import { pgDatabase, mgDatabase } from './db/database';
+// import { Reservation } from 'apps/reservation/src/pg/models/reservation.entity';
+// import { Users } from 'apps/auth/src/pg/users/models/users.entity';
 @Module({
   imports : [
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService)=>
         configService.get('mg-database'),
-        // useFactory: (configService: ConfigService)=>({
-        //   uri: configService.get('MONGODB_URI')
-        // }),
+      // useFactory: (configService: ConfigService)=>({
+      //   uri: configService.get('MONGODB_URI')
+      // }),
       inject: [ConfigService]
     }),
     TypeOrmModule.forRootAsync({

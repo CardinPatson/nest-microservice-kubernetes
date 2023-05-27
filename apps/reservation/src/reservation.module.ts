@@ -3,13 +3,13 @@ import { DatabaseModule } from '@app/common/database';
 import { ReservationService } from './mg/reservation.service';
 import { ReservationController } from './mg/reservation.controller';
 import { ReservationRepository } from './mg/reservation.repository';
-import { PGReservationService } from './pg/pg-reservation.service';
-import { PGReservationController } from './pg/pg-reservation.controller';
-import { PGReservationRepository } from './pg/pg-reservation.repository';
-import { ReservationDocument, ReservationSchema } from './models/reservation.schema';
+import { PGReservationService } from './pg/reservation.service';
+import { PGReservationController } from './pg/reservation.controller';
+import { PGReservationRepository } from './pg/reservation.repository';
+import { ReservationDocument, ReservationSchema } from './mg/models/reservation.schema';
 // import { LoggerModule, PGDatabaseModule } from '@app/common';
 import { LoggerModule } from '@app/common/logger';
-import { Reservation } from './models/reservation.entity';
+import { Reservation } from './pg/models/reservation.entity';
 
 @Module({
   imports: [

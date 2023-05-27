@@ -1,8 +1,8 @@
 import { PGAbstractData, PGAbstractRepository } from "@app/common/database";
-import { Reservation } from "../models/reservation.entity";
+import { Reservation } from "./models/reservation.entity";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { PGReservationRepositoryInterface } from "../interfaces/pg-reservation.interface";
+import { ReservationRepositoryInterface } from "./interfaces/reservation.interface";
 import { Repository } from "typeorm";
 // import { Logger } from "nestjs-pino";
 // import { Logger } from "typeorm";
@@ -10,7 +10,7 @@ import { Repository } from "typeorm";
 @Injectable()
 export class PGReservationRepository 
   extends PGAbstractRepository<Reservation>
-  implements PGReservationRepositoryInterface
+  implements ReservationRepositoryInterface
   {
     // protected readonly logger = new Logger(ReservationEntity);
     constructor(
