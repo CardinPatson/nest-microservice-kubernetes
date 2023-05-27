@@ -1,3 +1,4 @@
+import { PGAbstractData } from "@app/common";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('reservation')
@@ -13,9 +14,6 @@ export class Reservation{
 
   @Column()
   endDate: Date;
-
-  @Column()
-  testMigration: String;
 
   // @Column()
   // userId: number;

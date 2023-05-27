@@ -6,9 +6,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository){}
 
-  create(createUserDto: CreateUserDto){
+  async create(createUserDto: CreateUserDto){
     const user = this.usersRepository.create(createUserDto)
-
-    return this.usersRepository.save(user)
+    return await this.usersRepository.save(user).catch(err=>console.log(err))
   }
 }
