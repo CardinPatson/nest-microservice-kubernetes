@@ -357,5 +357,19 @@ nest g service users
 
 Add the new service to the authentification
 
+### Avec Passport JS
 
+```bash
+pnpm i passport @nestjs/passport passport-local
+
+pnpm i -D @types/passport-local
+
+pnpm i @nestjs/jwt passport-jwt 
+
+pnpm i -D @types/passport-jwt
+```
+
+Ajouter le module JWT au module d'authentification (dans l'import du module)
+
+Configuration du module JWT avec des variables d'environnement (secret: Token spécial utilisé par jwt pour vérifier le jwt token entrant )
 

@@ -9,12 +9,22 @@ import { UsersModule as MGUsersModule} from './mg/users/users.module';
 import { UsersModule as PGUsersModule } from './pg/users/users.module';
 
 import { LoggerModule } from '@app/common/logger';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     MGUsersModule,
     PGUsersModule,
-    LoggerModule
+    LoggerModule,
+    JwtModule.registerAsync({
+      useFactory: ((configService: ConfigService) =>({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: `${configService.get("JWT_EXPIRATION")}`
+        }
+      }))
+    })
   ],
   controllers: [MGAuthController, PGAuthController],
   providers: [MGAuthService, PGAuthService],
