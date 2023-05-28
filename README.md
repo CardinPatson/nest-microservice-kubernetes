@@ -1,73 +1,93 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## MICROSERVICE APP WITH POSTGRES
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Installation du Backend
 
-## Description
+- Environement
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Il est préférable de lancer le projet sur un environnement linux, si vous êtes sur windows, installez [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install):
 
-## Installation
+- Installez [docker](https://docs.docker.com/engine/install/ubuntu/)
 
-```bash
-$ pnpm install
+- Installez docker-compose
+
+```
+sudo apt install docker-compose
 ```
 
-## Running the app
+si vous avez les services postgresql et mongod actif, arreter les,
 
-```bash
-# development
-$ pnpm run start
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```
+sudo service postgresql stop
+sudo service mongod stop
 ```
 
-## Test
+- Installez [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
-```bash
-# unit tests
-$ pnpm run test
+A la racine du projet on a un docker-compose.yml qui lance chaque microservice
 
-# e2e tests
-$ pnpm run test:e2e
+Installez [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) qui permet de gérer les versions de node
 
-# test coverage
-$ pnpm run test:cov
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 ```
 
-## Support
+- Installez la la version  18.15.0 de Nodejs, installez pnpm et  la cli [nest](https://docs.nestjs.com/cli/overview) globalement
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+nvm install 18.15.0
 
-## Stay in touch
+npm install -g pnpm
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+npm install -g @nestjs/cli
+```
 
-## License
+Installez les dépendances et lancez l'application
 
-Nest is [MIT licensed](LICENSE).
+```
+pnpm install
+
+docker-compose up
+```
+
+
+### Migration d'une entité
+
+Chaque microservice possède son propre data-source qui importe les entités disponible dans le microservice
+
+Pour chaque modification d'une entité on doit générer une nouvelle migration.
+
+- Le data-source se trouvera toujours dans le dossier `<Microservice>/src/db/`
+- Le dossier de migrations se trouve dans le dossier  `<Microservice>/src/db/migrations/`
+
+Exemple
+
+Pour générer une migration (AuthMigration) Pour le microservice Auth, la commande est donc
+
+```
+pnpm run typeorm -d auth/src/db/data-source.ts migration:generate auth/src/db/migrations/AuthMigration
+```
+
+En général
+
+```
+pnpm run typeorm -d <Microservice>/src/db/data-source.ts migration:generate <Microservice>/src/db/migrations/<NomMigration>
+```
+
+### Librarie commune
+
+Elle est utilisé par tous les microservices qui effectue des opération communes. Elle permet abstraits les opérations liés à l'orm dans notre cas TypeORM
+
+Elle est donc importé dans chaque microservice afin d'effectuer les opérations d'insertion, modification, recherche sur la base de données
+
+### Microservice
+
+Les différents microservices se trouvent dans le dossier app et sont lancés indépendament dans lors de l'éxécution du docker-compose
+
+Chaque microservice a la même architecture
+
+

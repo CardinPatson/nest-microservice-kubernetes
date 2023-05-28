@@ -25,6 +25,7 @@ import { pgDatabase, mgDatabase } from './db/database';
         POSTGRES_PORT: Joi.number().required().default(5432),
         POSTGRES_HOST: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
+        PORT: Joi.number().required()
       })
     }),
     DatabaseModule, 

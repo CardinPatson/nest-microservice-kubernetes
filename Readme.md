@@ -377,3 +377,29 @@ Ajouter le module JWT au module d'authentification (dans l'import du module)
 
 Configuration du module JWT avec des variables d'environnement (secret: Token spécial utilisé par jwt pour vérifier le jwt token entrant )
 
+Pour faciliter le déploiement de l'application, au lieu d'accorder les ports 
+sur lequel les microservice tourne, on importe le service de configuration dans le module afin d'avoir le port venant de l'environnment 
+
+- Stratégie local avec passport
+
+Dans le microservice d'authentification, on créer une nouvelle stratégie (local.strategy.ts) qui sera la stratégie qui va nous permettre de s'authentifier avec l'email de l'utilisateur et son mot de passe 
+
+C'est une classe Injectable
+
+Pour la création d'utilisateur en base de données, on va:
+
+- hasher leur mot de passe via BCrypt
+
+```
+pnpm i bcrypt
+pnpm i -D @types/bcrypt
+```
+
+ Le décorateur UseGuard de nestjs va éxécuter un guard (dans notre cas la stratégie qu'on a créer ) afin de valider l'utilisateur
+
+ NB Toute les classes injectable d'un module doivent être dans le provider de celui ci
+
+ ```
+ pnpm i bcryptjs express
+
+ ```

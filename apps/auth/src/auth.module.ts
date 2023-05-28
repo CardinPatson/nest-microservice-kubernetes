@@ -14,6 +14,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 
 import { pgDatabase, mgDatabase } from './db/database';
+import { LocalStrategy as MGLocalStrategy } from './mg/strategies/local.strategy';
+import { LocalStrategy as PGLocalStrategy } from './pg/strategies/local.strategy';
+
 @Module({
   imports: [
     MGUsersModule,
@@ -30,7 +33,8 @@ import { pgDatabase, mgDatabase } from './db/database';
         POSTGRES_HOST: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION: Joi.string().required()
+        JWT_EXPIRATION: Joi.string().required(),
+        PORT: Joi.number().required()
       })
     }),
     JwtModule.registerAsync({
@@ -44,6 +48,6 @@ import { pgDatabase, mgDatabase } from './db/database';
     })
   ],
   controllers: [MGAuthController, PGAuthController],
-  providers: [MGAuthService, PGAuthService],
+  providers: [MGAuthService, PGAuthService, MGLocalStrategy,PGLocalStrategy],
 })
 export class AuthModule {}
