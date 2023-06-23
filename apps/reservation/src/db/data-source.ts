@@ -18,6 +18,7 @@ export const dataSourceOptions: DataSourceOptions = {
   // entities: [`dist/**/**.entity{.ts,.js}`],
   migrations: [path.resolve(`${__dirname}/migrations/*{.ts,.js}`)],
   synchronize: false, // ! SET TO FALSE IN PRODUCTION
+  // synchronize: !(process.env.NODE_ENV.trim() === 'production'),
   logging: true
 
 };

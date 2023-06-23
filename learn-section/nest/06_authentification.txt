@@ -1,0 +1,189 @@
+Authentification avec nestjs
+-----------------------------
+
+
+1. Le Module d'authentification
+
+Commencons par générer un module d'authentification ou on va venir configurer les différentes stratégie
+
+nest g module auth
+nest g controller auth
+nest g service auth
+
+Les opérations liées à l'utilisateur seront dans un module à l'intérieur du module d'authentification
+
+nest g module auth 
+nest g service users
+
+Dans le module de l'utilsateur on aura quelque chose comme sa,
+```
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
+```
+
+Point de terminaison (/login)
+
+- Dans le service de l'authentification, le plus basique que l'on peut avoir est
+
+import {Injectable, UnauthorizedException} from "@nestjs/common"
+import {userService} from "user.service"
+
+@Injectable()
+export class AuthService{
+  constructor(private readonly userService: UserService){
+
+  }
+
+  async signIn(username: string, password: string){
+    // trouver l'utilisateur
+    const user = this.userService.findOne(username)
+
+    if(user?.password !== pass ){
+      throw new UnauthorizedException();
+    }
+
+    const {password, ...result} = user
+    return result
+  }
+}
+
+NB Dans un application réel on utilise bcrypt avec un algorithme de hashage unidirectionnel salé 
+
+- Dans le module de l'authentification on va importer le service utilisateur (car on l'utilise dans le service de l'authentification)
+
+import Module from "@nestjs/common"
+import {AuthService} from "auth.service"
+import {UsersModule} from "users.module"
+import {AuthController} from "auth.controller"
+import {AuthService} from "auth.service"
+
+@Module({
+  imports: [UsersModule],
+  controllers: [AuthController],
+  providers: [AuthService]
+})
+
+export class AuthModule(){}
+
+
+- Dans le controller, on rajoute la méthode qui sera appelé par le client pour authentifier un utilisateur
+
+(auth.controller.ts)
+
+```
+import {Body, Post, Controller} from "@nestjs/common"
+import {AuthService} from "user.service"
+
+@Controller("auth")
+export const AuthController(){
+  constructor(private readonly authService: AuthService){}
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  signIn(@Body() signInDto, Record<string, any>){
+    return this.authService.signIn(signInDto.username, signInDto.password)
+  }
+}
+```
+
+II. Implémentation du jeton JWT
+
+npm install --save @nestjs/jwt
+
+Si on veut intégrer le jwt dans le service d'authentification, on aura:
+
+```
+import {Injectable, UnauthorizedException"} from "@nestjs/common "
+import {UsersService} from "user.service"
+@Injectable()
+export class AuthService{
+  constructor(private readonly usersService: UserService){}
+
+  async signIn(username, pass){
+    const user = await this.userService.findOne(username)
+
+    if(user?.password !== password){
+      throw new UnauthorizedException()
+    }
+
+    const payload = {sub: user.userId, username: user.username}
+    return {
+      access_token: await this.jwtService.signAsync(payload)
+    }
+  }
+}
+
+```
+Dans le module d'authentification, a coté de l'import du module user on import la config du jwt
+
+JwtModule.register({
+  global: true,
+  secret: jwtConstants.secret,
+  signInOoptions: {expires: '60s'}
+})
+
+isGlobal permet de rendre l'import du module glabalement dans l'application
+
+III. Guarde d'authentification
+
+auth.guard.ts -- 
+
+NB: Sert à protéger les points de terminaison en exigeant qu'un JWT valide soit présent sur la demande 
+
+AuthGuard va permettre de protéger les routes (check le token et return true si il est valid)
+
+import {Injectable} from "@nestjs/common"
+
+@Injectable()
+export class AuthGuard implements CanActivate{
+  constructor(private jwtService: JwtService){}
+
+  async canActivate(context: ExecutionContext): Promise<boolean>{
+    // Récupère l'objet de requête
+    const request = context.switchToHttp().getRequest()
+    const token = this.extractTokenFromHeader(request)
+
+    if(!token){
+      throw new UnauthorizedException();
+    }
+    try{
+      const payload = await jwtService.verifyAsync(
+        token,
+        {
+          secret: jwtConstants.secret
+        }
+      );
+
+      request['user] = payload
+    }catch{
+      throw new UnauthorizedException()
+    }
+    return true
+  }
+
+  private extractTokenFromHeader(request: Request )string | undefined{
+    const [type, token] = request.headers.authorization?.split(' ') ?? [] // ?? permet d'eviter le sinon
+
+    return type === "Baerer" token: undefined
+  }
+}
+
+Dans le controller lorsqu'on a une nouvelle route, on peut avoir
+
+@UseGuards(AuthGuard)
+@Get('profile')
+getProfile(@Request() req){
+  return req.user
+}
+
+
+Stratégie d'authentification avec passport
+
+
+
