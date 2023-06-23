@@ -17,6 +17,8 @@ import { pgDatabase, mgDatabase } from './db/database';
 import { LocalStrategy as MGLocalStrategy } from './mg/strategies/local.strategy';
 import { LocalStrategy as PGLocalStrategy } from './pg/strategies/local.strategy';
 
+import { JwtStrategy as MGJwtStrategy } from './mg/strategies/jwt.strategy';
+import { JwtStrategy as PGJwtStrategy } from './pg/strategies/jwt.strategy';
 @Module({
   imports: [
     MGUsersModule,
@@ -48,6 +50,6 @@ import { LocalStrategy as PGLocalStrategy } from './pg/strategies/local.strategy
     })
   ],
   controllers: [MGAuthController, PGAuthController],
-  providers: [MGAuthService, PGAuthService, MGLocalStrategy,PGLocalStrategy],
+  providers: [MGAuthService, PGAuthService, MGLocalStrategy,PGLocalStrategy, MGJwtStrategy, PGJwtStrategy],
 })
 export class AuthModule {}

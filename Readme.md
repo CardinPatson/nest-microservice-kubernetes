@@ -49,7 +49,7 @@ All different microservice can use for all operation (database access, authentif
 
 Write this and import into each microservice that want to use (reuse) -- shared module
 
-nest generate common
+nest generate library common
 
 will add a project section in the nest-cli.json (to reference the new library)
 
@@ -403,3 +403,13 @@ pnpm i -D @types/bcrypt
  pnpm i bcryptjs express
 
  ```
+
+ Stratégie qui va valider le jwt token
+
+ pour le cookie on aura besoin de 
+
+ pnpm i cookie-parser
+
+ pnpm i -D @types/cookie-parser
+
+ 
