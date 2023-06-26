@@ -1,0 +1,37 @@
+Dans le controlleur principale de l'application
+
+on peut avoir :
+
+import { of } from 'rxjs';
+import { join } from 'path';
+
+
+@Get('public/images/cards/:img')
+seeUploadedFileDal(@Param('img') image, @Res() res) {
+  return of(
+    res.sendFile(join(process.cwd(), 'public/images/cards/' + image)),
+  );
+}
+@Get('public/images/dal/:img')
+seeUploadedFileCards(@Param('img') image, @Res() res) {
+  return of(res.sendFile(join(process.cwd(), 'public/images/dal/' + image)));
+}
+
+------------
+of : convertit l'argument en un observable(la réponse sera donc un observable)
+
+
+exemple
+-------
+of(10, 20, 30)
+  .subscribe({
+    next: value => console.log('next:', value),
+    error: err => console.log('error:', err),
+    complete: () => console.log('the end'),
+  });
+
+// Outputs
+// next: 10
+// next: 20
+// next: 30
+// the end

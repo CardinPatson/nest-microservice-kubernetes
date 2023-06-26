@@ -1,0 +1,19 @@
+By the end of this chapter, you should be able to:
+
+- Explain what a monolith is.
+- Discuss the monolith's challenges in the cloud.
+- Explain the concept of microservices.
+- Discuss microservices advantages in the cloud.
+- Describe the transformation path from a monolith to microservices.
+
+A monolith has to run on single system which has to satishy its compute memory, storage, networking
+
+Since it run as single process, the scaling of individual feature is impossible 
+
+Microservice concept: complex app composed of small independant process which communicate with each other 
+
+Each microservice is developped to be the best suitable for his function 
+
+Question:
+
+1. which businness component to separate to become microservice

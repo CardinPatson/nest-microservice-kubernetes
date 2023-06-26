@@ -1,0 +1,168 @@
+Create Kubernetes cluster
+
+- Cluster Kubernetes (déployer sur une vm ou physique)
+
+Les applications conteuneurisés sont déployé sur un cluster kuberenetes sans les lier à des machines individuelles
+
+Kubernetes automatise la distribution de conteneurs dans un cluster. Un cluster comprend : 
+1. Le COntrol Panel qui coordonne le cluster
+2. Les noeuds ceux qui exécutent les applications
+
+Le panneau de controle gère le cluster et coordonne toutes les activités de celui ci
+(plannification des applications,maintenance de ceux ci, déploiement de nouvelle mise à jour)
+
+Un noeuds est une machine individuelles dans un cluster(chaque noeuds a un kubelet)
+Le kubelet est un agent qui gère le noeuds et communique avec le panneau de controle
+
+Le noeuds disposent d'outils pour gérer les opérations du conteneur (containerd, docker)
+
+NB. Un cluster kubernets qui gère le traffic de produit doit avoir au moins 03 noeauds
+
+Lorsqu'on déploie une appli sur kub, on indique au panneau de contrôle de démarrer les conteneurs d'applications
+
+MINIKUBE: Implémentation kubernetes légère qui crée une machine virtuelle sur la machine locale et déploie un cluster simple contenant un noeud
+
+HELLO MINIKUBE
+--------------
+
+Run sample app on kubernetes using minikube
+
+Set up minikube : https://minikube.sigs.k8s.io/docs/start/
+
+1. New-Item -Path 'c:\' -Name 'minikube' -ItemType Directory -Force
+Invoke-WebRequest -OutFile 'c:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
+
+2. $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
+if ($oldPath.Split(';') -inotcontains 'C:\minikube'){ `
+  [Environment]::SetEnvironmentVariable('Path', $('{0};C:\minikube' -f $oldPath), [EnvironmentVariableTarget]::Machine) `
+}
+
+wsl 
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+if kubectl not found : https://stackoverflow.com/questions/55360666/kubernetes-kubectl-run-command-not-found
+
+Start:
+
+1. Intéragir avec le cluster
+
+kubectl get po -A
+
+2. avec la commande minikube: minikube kubectl -- get po -A
+
+3. Créer un alias alias kubectl="minikube kubectl --"
+
+4. minikube dashboard (pour voir l'interface du cluster)
+
+-- Création d'un déploiement et exposition sur le port 8080
+
+kubectl create deployment hello-minikube --image=kicbase/echo-server:1.0 (creation du pod)
+kubectl expose deployment hello-minikube --type=NodePort --port=8080 (exposition du pod)
+
+-- Afficher le déploiement créer
+
+kubectl get service hello-minikube (kubectl get service --  affiche aussi l'état du cluster)
+
+minikube delete --all
+
+-- acceder a un conteneur dans kubernetes
+
+minikube delete --all
+
+-- Acceder au service
+
+
+-- pour transferer le port du noeuds:
+
+kubectl port-forward service/hello-minikube 7080:8080
+
+-- Suspendre kubernetes sans impact sur les appli déployer
+
+minikube pause 
+
+minikube unpause 
+
+minikube stop (arrete le cluster)
+
+minikube delete --all (supprime tous les clusters)
+
+minikube start -p aged --kubernetes-version=v1.16.1 (créer un cluster utilisant une ancienne version)
+
+minikube addons list (parcours le catalogue de service kubernetes)
+
+minikube config set memory 9001 (modifie la limite de mémoire par défaut)
+
+POD
+------
+
+Groupe d'un ou plusieurs conteneurs liés ensemble à des fins d'administration et de mise en réseau 
+pour afficher les pods, on exécute la commande (kubectl get pods)
+
+- afficher les évenements du cluster: kubectl get events/kubectl config view 
+
+NB UN POD NEST ACCESSIBLE QUE PAR SON IP INTERNE AU SEIN DU CLUSTER 
+
+Pour rendre le Pod accessible depuis l'extérieur de réseau virtuel kubernetes, on doit exposer le pod en tant que service 
+
+kubectl expose deployment hello-node --type=LoadBalancer --port=8080
+
+--type=LoadBalancer -> exposer le service en déhors du cluster
+
+avec un fichier yaml 
+
+kubectl apply -f 
+
+kubectl delete -n default deployment gateway-deployment
+:kubectl delete -n default pod gateway
+
+kubectl delete -f helloworld.yml
+
+--------------------------------
+FICHIER DE CONFIGURATION YAML
+--------------------------------
+
+Tous les fichiers de configuration sur kubernetes on 3 parties 
+1.Metadata
+2. Specification : Contient chaque type de configuration que l'on veut appliquer 
+
+configuration de deploiement
+----------------------------
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels: ...
+spec:
+  replicas: 2
+  selector: ...
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16
+        ports:
+        - containerPort: 8080
+
+Configuration d'un service
+----------------------------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector: ...
+  template: ...
+
+Le ETCD est le celui qui gère le cluster et stocke les données de celui ci. Il détient à chaque instant le status
+de tous les composants 
+
+Chaque fois que quelque chose est editer dans le déploiement il est répercuté sur tous les pods 
+
+Un pod peut avoir sa propre configuration (metadata, spec) à l'intérieur d'un déploiement 

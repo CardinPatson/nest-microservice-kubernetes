@@ -1,0 +1,13 @@
+Une Gateway (Passerelle) est une classe annoté avec le décorateur @WebSocketGateway()
+
+Les passerelle sont indépendante de la plateforme
+
+On a 02 plateform WS qui sont prise en charge : socket.io, WS
+
+-- Possibilité de créer son propre adaptateur
+-- Les passerelles sont comme des fournisseurs => ils peuvent injecter des dépendances & être injectées par d'autre classe
+
+Initialisation d'une application basé sur les websockets
+
+npm i --save @nestjs/websockets @nestjs/platform-socket.io
+  

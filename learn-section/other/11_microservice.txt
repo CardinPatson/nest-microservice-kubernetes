@@ -1,0 +1,92 @@
+MICROSERVICE
+
+Les concepts vu précédemment (Injection de dépendance, Décorateur, Filtre, Canaux, Guarde, Intercepteur) s'appliquent aux microservices
+
+Dans Nest un microservice est unea application qui utilise un couche de transport différente de HTTP
+
+Nest prend en charge plusieurs couches de transport intégré(Transporteur)
+Les transporteurs sont responsable de la transmission des message entre différents microservice
+
+Installation
+
+npm i --save @nestjs/microservices
+
+Instanciation 
+
+On utilise la méthode createMicroservice() de NestFactory()
+main.ts
+-------
+
+import {NestFactory} from '@nestjs/core'
+import {Transport, MicroserviceOptions} from '@nestjs/microservices';
+import {AppModule} from './app.module'
+
+async function bootstrap(){
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.TCP
+    }
+  );
+  await app.listen()
+}
+
+bootstrap()
+
+NB Par défaut la couche TCP est utilisé
+Le second argument de createMicroservice est un obj d'option (1. Spécifie le transporteur 2. Spécifie les options du transporteur)
+
+Motifs
+--------
+
+***Les microservices reconnaissent les messages et les évèvements par des modèles(valeur simple : obj ou chaine)
+
+Les modèles sont automatiquement sérialisé et renvoyé sur le réseau avec la partie données du message 
+
+VIA MESSAGE
+Pour créer un gestionnaire de message basé sur le paradigme requete/reponse on utilise le décorateur @MessagePattern()
+
+Pour activer un gestionnaire de message pareil, nest crée 2 canaux: 
+1. Responsable du transfet de données
+2. Attend les réponses entrantes
+
+Le transporteur NATS prend ce type de gestionnaire en charge
+
+exemple @MessagePattern()
+
+import {Controller} from "@nestjs/common"
+import {MessagePattern} from '@nestjs/microservice'
+
+@Controller()
+export class MathController{
+  @MessagePattern({cmd: 'sum'})
+  accumulate(data : number):number{
+    return (data|| []).reduce((a,b)=>a+b)
+  }
+}
+
+- Le gestionnaire de message accumulate ecoute les messages qui remplissent le modèle de message {cmd : 'sum'}
+- le gestionnaire prend 1 arg (data)
+
+VIA LES EVENEMENTS
+
+les messages sont idéales pour echanger des messages entre service mais lorsqu'on souhaite publier des évenements sans attendre de réponse  on utilise les évenements
+car on ne souhaite pas avoir 02 canaux
+
+Exemple : Informer un autre service qu'une condition s'est produite dans une partie du systeme:
+
+on utilisera le décorateur @EventPattern()
+
+@EventPattern("user_created")
+async handleUserCreated(data:Record<string, unknow>){
+  //logic
+}
+
+NB Plusieur gestionnaire d'évenement peuvent être enregistré pour le même modèle et seront déclenchés en parallèle
+
+
+envoyer des requetes http au nats
+
+docker pull aaguilar/nats-proxy
+
+docker run -it --rm -p 8080:8080 aaguilar/nats-proxy -p 8080 -n nats://localhost:4222
