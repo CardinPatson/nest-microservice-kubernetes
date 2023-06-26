@@ -1,0 +1,10 @@
+Tool for container orchestration (managing multiple docker container as a single service)
+
+- Need
+
+- Health check on every container
+- Ensuire all containers are up on every system
+- scaling the containers up or down depending on the load
+- adding updates/changes to all the containers
+
+docker stack deploy -c .\docker-compose.develop.yml unlymeetserver

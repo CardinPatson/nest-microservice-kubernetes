@@ -22,19 +22,20 @@ services:
     build:
       context: .
       dockerfile: ./apps/reservation/Dockerfile
-      target: development 
+      target: development
     # command: pnpm start:dev reservation
-    command: 
+    command:
       - /bin/sh
       - -c
-      - | 
+      - |
         pnpm run typeorm -d ./apps/reservation/src/db/data-source.ts migration:run
         pnpm start:dev reservation
     ports:
       - '3000:3000'
     volumes:
       - .:/usr/src/app
-    depends_on: [postgres, mongo]
+      - /usr/src/app/node_modules
+    depends_on: [ postgres, mongo ]
     env_file:
       - ./libs/common/.env
       - ./apps/reservation/.env
@@ -44,7 +45,7 @@ services:
       dockerfile: ./apps/auth/Dockerfile
       target: development
     # command: pnpm start:dev auth
-    command: 
+    command:
       - /bin/sh
       - -c
       - |
@@ -54,7 +55,8 @@ services:
       - '3001:3001'
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
     env_file:
       - ./libs/common/.env
       - ./apps/auth/.env
-    depends_on: [postgres, mongo]
+    depends_on: [ postgres, mongo ]

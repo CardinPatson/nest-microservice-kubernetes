@@ -5,7 +5,7 @@ import { AuthService as MGAuthService } from './mg/auth.service';
 import { AuthController as PGAuthController } from './pg/auth.controller';
 import { AuthService as PGAuthService } from './pg/auth.service';
 
-import { UsersModule as MGUsersModule} from './mg/users/users.module';
+import { UsersModule as MGUsersModule } from './mg/users/users.module';
 import { UsersModule as PGUsersModule } from './pg/users/users.module';
 
 import { LoggerModule } from '@app/common/logger';
@@ -36,20 +36,27 @@ import { JwtStrategy as PGJwtStrategy } from './pg/strategies/jwt.strategy';
         POSTGRES_DB: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
-        PORT: Joi.number().required()
-      })
+        PORT: Joi.number().required(),
+      }),
     }),
     JwtModule.registerAsync({
-      useFactory: ((configService: ConfigService) =>({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: `${configService.get("JWT_EXPIRATION")}`
-        }
-      })),
-      inject:[ConfigService]
-    })
+          expiresIn: `${configService.get('JWT_EXPIRATION')}`,
+        },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [MGAuthController, PGAuthController],
-  providers: [MGAuthService, PGAuthService, MGLocalStrategy,PGLocalStrategy, MGJwtStrategy, PGJwtStrategy],
+  providers: [
+    MGAuthService,
+    PGAuthService,
+    MGLocalStrategy,
+    PGLocalStrategy,
+    MGJwtStrategy,
+    PGJwtStrategy,
+  ],
 })
 export class AuthModule {}

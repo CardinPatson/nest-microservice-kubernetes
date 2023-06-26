@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { ModelDefinition, MongooseModule } from '@nestjs/mongoose';
-import {TypeOrmModule} from "@nestjs/typeorm"
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 @Module({
-  imports : [
+  imports: [
     MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService)=>
+      useFactory: (configService: ConfigService) =>
         configService.get('mg-database'),
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       // name: "pgDB",
@@ -21,15 +21,14 @@ import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-clas
         const dataSource = await new DataSource(options).initialize();
         return dataSource;
       },
-    })
-  ]
-
+    }),
+  ],
 })
 export class DatabaseModule {
-  static mgForFeature(models: ModelDefinition[]){
-    return MongooseModule.forFeature(models)
+  static mgForFeature(models: ModelDefinition[]) {
+    return MongooseModule.forFeature(models);
   }
-  static pgForFeature(entity:EntityClassOrSchema[]){
-    return TypeOrmModule.forFeature(entity)
+  static pgForFeature(entity: EntityClassOrSchema[]) {
+    return TypeOrmModule.forFeature(entity);
   }
 }
